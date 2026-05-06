@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💗 Aphrodite · Desire Pairing Engine</title>
+    <title>💗 Aphrodite · Love Letter Composer</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="importmap">
         { "imports": { "@xenova/transformers": "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js" } }
@@ -19,6 +19,7 @@
             --muted: #9a7a8a;
             --aphrodite: #b05870;
             --rose: #c06078;
+            --rose-light: #e8c0d0;
             --gold: #c8943a;
             --desire-high: #e87890;
             --desire-med: #c06078;
@@ -29,57 +30,183 @@
             --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); font-family: var(--font-body); color: var(--text); min-height: 100vh; }
+        body { 
+            background: var(--bg); 
+            font-family: var(--font-body); 
+            color: var(--text); 
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 30% 20%, rgba(176,88,112,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(176,88,112,0.04) 0%, transparent 50%);
+        }
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
 
-        .header { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
-        .header h1 { font-family: var(--font-display); font-size: 2.5rem; color: var(--aphrodite); letter-spacing: 4px; }
+        .header { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 1.5rem; 
+        }
+        .header h1 { 
+            font-family: var(--font-display); 
+            font-size: 2.5rem; 
+            color: var(--aphrodite); 
+            letter-spacing: 4px; 
+        }
         .header h1 span { color: var(--text); }
-        .header-sub { font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; margin-top: 0.5rem; }
-        .type-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px; font-family: var(--font-mono); font-size: 0.55rem; background: rgba(176,88,112,0.15); color: var(--aphrodite); border: 1px solid var(--aphrodite); margin-top: 0.5rem; }
+        .header-sub { 
+            font-family: var(--font-mono); 
+            font-size: 0.6rem; 
+            color: var(--muted); 
+            letter-spacing: 2px; 
+            margin-top: 0.5rem; 
+        }
+        .domain-badge { 
+            display: inline-block; 
+            padding: 0.2rem 0.8rem; 
+            border-radius: 3px; 
+            font-family: var(--font-mono); 
+            font-size: 0.55rem; 
+            background: rgba(176,88,112,0.15); 
+            color: var(--aphrodite); 
+            border: 1px solid var(--aphrodite); 
+            margin-top: 0.5rem;
+            letter-spacing: 1px;
+        }
 
-        .status-bar { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted); }
-        .status-bar span { color: var(--text); }
+        .status-bar { 
+            display: flex; 
+            gap: 2rem; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            margin-bottom: 2rem; 
+            font-family: var(--font-mono); 
+            font-size: 0.6rem; 
+            color: var(--muted); 
+        }
+        .status-bar span { color: var(--text); font-size: 0.7rem; }
 
-        .controls { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
-        button { font-family: var(--font-mono); font-size: 0.65rem; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); transition: all 0.2s; letter-spacing: 1px; }
-        button:hover:not(:disabled) { background: var(--aphrodite); color: #fff; border-color: var(--aphrodite); }
-        button.primary { background: var(--aphrodite); color: #fff; border-color: var(--aphrodite); }
+        .controls { 
+            display: flex; 
+            gap: 0.5rem; 
+            justify-content: center; 
+            margin-bottom: 2rem; 
+            flex-wrap: wrap; 
+        }
+        button { 
+            font-family: var(--font-mono); 
+            font-size: 0.65rem; 
+            padding: 0.55rem 1.1rem; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            border: 1px solid var(--border); 
+            background: var(--panel); 
+            color: var(--text); 
+            transition: all 0.2s; 
+            letter-spacing: 1px; 
+        }
+        button:hover:not(:disabled) { 
+            background: var(--aphrodite); 
+            color: #fff; 
+            border-color: var(--aphrodite); 
+        }
+        button.primary { 
+            background: var(--aphrodite); 
+            color: #fff; 
+            border-color: var(--aphrodite); 
+        }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
         .spin { display: inline-block; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .pairs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 0.8rem; margin-bottom: 2rem; }
+        /* Love Letters Grid */
+        .letters-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
+            gap: 1rem; 
+            margin-bottom: 2rem; 
+        }
 
-        .pair-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; transition: all 0.2s; border-left: 3px solid var(--aphrodite); }
-        .pair-card:hover { border-color: var(--rose); transform: translateY(-1px); }
-        .pair-card.token-token { border-left-color: var(--gold); }
-        .pair-card.token-svo { border-left-color: var(--desire-high); }
-        .pair-card.svo-svo { border-left-color: var(--rose); }
-        .pair-card.verb-verb { border-left-color: #a070c0; }
-        .pair-card.subject-object { border-left-color: #70a0c0; }
+        .letter-card { 
+            background: var(--panel); 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            padding: 1.5rem; 
+            transition: all 0.25s; 
+            border-left: 4px solid var(--aphrodite);
+            position: relative;
+            overflow: hidden;
+        }
+        .letter-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, rgba(176,88,112,0.08), transparent);
+            pointer-events: none;
+        }
+        .letter-card:hover { 
+            border-color: var(--rose); 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
 
-        .pair-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
-        .pair-items { font-family: var(--font-body); font-size: 0.9rem; font-style: italic; margin-bottom: 0.5rem; line-height: 1.4; }
-        .pair-item-a { color: var(--rose); }
-        .pair-item-b { color: #c0a0b0; }
-        .pair-connector { color: var(--muted); font-size: 0.7rem; margin: 0 0.3rem; }
+        .letter-couplet {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-style: italic;
+            line-height: 1.8;
+            color: var(--rose-light);
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .letter-narrative {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 0.8rem;
+        }
+        .letter-scores {
+            display: flex;
+            gap: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.5rem;
+            color: var(--muted);
+        }
+        .letter-desire {
+            margin-left: auto;
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+        }
 
-        .pair-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.3rem; margin-bottom: 0.5rem; font-family: var(--font-mono); font-size: 0.5rem; color: var(--muted); }
-        .pair-scores div { text-align: center; }
-        .score-val { font-size: 0.65rem; display: block; }
-        .score-val.high { color: var(--desire-high); }
-        .score-val.med { color: var(--desire-med); }
-        .score-val.low { color: var(--desire-low); }
+        .log { 
+            background: #0d0a10; 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            padding: 0.6rem; 
+            max-height: 150px; 
+            overflow-y: auto; 
+            font-family: var(--font-mono); 
+            font-size: 0.52rem; 
+            color: var(--muted); 
+        }
+        .log-entry { padding: 0.12rem 0; }
 
-        .pair-meta { display: flex; gap: 0.3rem; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.48rem; }
-        .pair-tag { padding: 0.1rem 0.4rem; border-radius: 2px; background: rgba(176,88,112,0.1); color: var(--muted); }
-        .pair-desire { margin-left: auto; font-family: var(--font-display); font-size: 0.8rem; }
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
 
-        .log { background: #0d0a10; border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem; max-height: 150px; overflow-y: auto; font-family: var(--font-mono); font-size: 0.52rem; color: var(--muted); }
-        .log-entry { padding: 0.1rem 0; }
-
-        @media (max-width: 768px) { .pairs-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { 
+            .letters-grid { grid-template-columns: 1fr; } 
+        }
     </style>
 </head>
 <body>
@@ -87,34 +214,38 @@
 
     <div class="header">
         <h1>💗 APHRO<span>DITE</span></h1>
-        <div class="header-sub">DESIRE PAIRING ENGINE · PYTHAGOREAN #2 · THE DYAD</div>
-        <div class="type-badge">OLYMPIAN</div>
+        <div class="header-sub">LOVE LETTER COMPOSER · PYTHAGOREAN #2 · THE DYAD</div>
+        <div class="domain-badge">DOMAIN: LOVE · BEAUTY · DESIRE</div>
     </div>
 
     <div class="status-bar" id="statusBar">
-        <div>Tokens: <span id="tokenCount">—</span></div>
-        <div>Triplets: <span id="tripletCount">—</span></div>
-        <div>Pairs: <span id="pairCount">—</span></div>
+        <div>Love tokens: <span id="tokenCount">—</span></div>
+        <div>Love triplets: <span id="tripletCount">—</span></div>
+        <div>Couplets: <span id="pairCount">—</span></div>
         <div>Dispatched: <span id="dispatchCount">—</span></div>
     </div>
 
     <div class="controls">
-        <button id="fetchBtn" class="primary">📥 Fetch from Hermes + Demeter</button>
-        <button id="pairBtn" disabled>💗 Find Pairs</button>
-        <button id="dispatchBtn" disabled>📤 Dispatch to Ares</button>
+        <button id="fetchBtn" class="primary">💗 Fetch Love Tokens from Hermes</button>
+        <button id="pairBtn" disabled>💗 Compose Couplets</button>
+        <button id="dispatchBtn" disabled>💌 Send Love Letters to Apollo</button>
     </div>
 
-    <div class="pairs-grid" id="pairsGrid">
-        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted);font-style:italic;">
-            Fetch tokens and triplets, then find what desires what.
+    <div class="letters-grid" id="lettersGrid">
+        <div class="empty-state">
+            Fetch tokens from Hermes.<br>
+            Aphrodite will find the love stories hidden within.
         </div>
     </div>
 
-    <div class="log" id="log"><div class="log-entry">💗 Aphrodite waiting. The Dyad observes.</div></div>
+    <div class="log" id="log"><div class="log-entry">💗 Aphrodite waiting. She knows what love looks like.</div></div>
 
 </div>
 
 <script type="module">
+// ════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════
 const KAIROS_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
 const KAIROS_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 const sb = window.supabase.createClient(KAIROS_URL, KAIROS_KEY);
@@ -125,27 +256,93 @@ env.useBrowserCache = true;
 
 let embedder = null;
 let modelReady = false;
-let allItems = [];
-let pairs = [];
+let loveItems = [];
+let loveLetters = [];
 
-const BEAUTY_ANCHORS = ['harmonia', 'golden', 'luminous', 'graceful', 'radiant', 'elegant', 'bloom', 'resonance'];
-let beautyEmbeddings = [];
+// ════════════════════════════════════════════════
+// APHRODITE'S DOMAIN — LOVE WORDS
+// ════════════════════════════════════════════════
+const LOVE_WORDS = new Set([
+    'love','desire','beauty','passion','romance','heart','soul','kiss','embrace',
+    'union','wedding','devotion','adore','cherish','beloved','sweet','tender',
+    'gentle','soft','warm','bloom','flower','rose','garden','grace','elegant',
+    'radiant','luminous','golden','harmony','peace','kindness','joy','delight',
+    'pleasure','bliss','aphrodite','venus','eros','charm','attraction','allure',
+    'seduction','courtship','poetry','song','music','dance','art','beautiful',
+    'lovely','darling','honey','muse','enchant','bewitch','captivate','rapture',
+    'caress','whisper','promise','vow','eternal','forever','destiny','fate'
+]);
 
+const LOVE_VERBS = new Set([
+    'loves','adores','desires','embraces','kisses','holds','cherishes','devotes',
+    'attracts','charms','seduces','enchants','captivates','bewitches','blooms',
+    'radiates','glows','shines','warms','heals','soothes','calms','comforts',
+    'unites','binds','joins','merges','harmonizes','dances','sings','whispers',
+    'yearns','longs','aches','burns','melts','surrenders','gives','receives'
+]);
+
+const LOVE_SUBJECTS = new Set([
+    'heart','soul','love','beauty','desire','passion','lover','beloved',
+    'aphrodite','venus','eros','muse','goddess','rose','garden','flame',
+    'embrace','kiss','touch','whisper','promise','vow','dream','vision'
+]);
+
+const LOVE_OBJECTS = new Set([
+    'heart','soul','beauty','love','desire','passion','flower','rose',
+    'garden','light','flame','song','poem','dream','vision','eternity',
+    'forever','destiny','fate','harmony','peace','joy','bliss','grace'
+]);
+
+function isLoveToken(word) {
+    const w = word.toLowerCase();
+    if (LOVE_WORDS.has(w)) return true;
+    if (LOVE_VERBS.has(w)) return true;
+    if (LOVE_SUBJECTS.has(w)) return true;
+    if (LOVE_OBJECTS.has(w)) return true;
+    if (w.includes('lov') || w.includes('heart') || w.includes('soul') || w.includes('desir')) return true;
+    if (w.includes('beat') || w.includes('charm') || w.includes('tend') || w.includes('soft')) return true;
+    return false;
+}
+
+// ════════════════════════════════════════════════
+// SVO TAGGING FOR LOVE TOKENS
+// ════════════════════════════════════════════════
+function tagLoveWord(word) {
+    const w = word.toLowerCase();
+    const isSubj = LOVE_SUBJECTS.has(w);
+    const isVerb = LOVE_VERBS.has(w);
+    const isObj = LOVE_OBJECTS.has(w);
+    
+    if (isSubj && !isVerb && !isObj) return 'S';
+    if (!isSubj && isVerb && !isObj) return 'V';
+    if (!isSubj && !isVerb && isObj) return 'O';
+    if (isSubj && isVerb) return 'SV';
+    if (isVerb && isObj) return 'VO';
+    
+    return '—';
+}
+
+// ════════════════════════════════════════════════
+// LOGGING
+// ════════════════════════════════════════════════
 function log(msg) {
     const el = document.getElementById('log');
     el.innerHTML = `<div class="log-entry">[${new Date().toLocaleTimeString()}] ${msg}</div>` + el.innerHTML;
     while (el.children.length > 30) el.removeChild(el.lastChild);
 }
 
+// ════════════════════════════════════════════════
+// MODEL (MiniLM, shared cache)
+// ════════════════════════════════════════════════
 async function loadModel() {
     try {
-        log('Loading MiniLM (shared with Hermes/Demeter, cached)...');
+        log('Loading MiniLM (cached from Hermes/Demeter)...');
         embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
         modelReady = true;
         document.getElementById('pairBtn').disabled = false;
-        log('✓ MiniLM ready. Aphrodite can feel desire.');
+        log('✓ MiniLM ready.');
     } catch (err) {
-        log(`Model failed: ${err.message}. Using fallback scoring.`);
+        log(`Model failed: ${err.message}. Fallback scoring active.`);
         modelReady = false;
         document.getElementById('pairBtn').disabled = false;
     }
@@ -164,180 +361,235 @@ function cosineSim(a, b) {
     return dot / (Math.sqrt(na) * Math.sqrt(nb));
 }
 
+// ════════════════════════════════════════════════
+// FETCH — LOVE FILTERED
+// ════════════════════════════════════════════════
 async function fetchAll() {
-    log('Fetching from Hermes and Demeter...');
+    log('Fetching tokens from Hermes — keeping only love...');
     document.getElementById('fetchBtn').disabled = true;
     document.getElementById('fetchBtn').innerHTML = '<span class="spin">⟳</span> Fetching...';
-    allItems = [];
-    pairs = [];
+    loveItems = [];
+    loveLetters = [];
 
     try {
-        const { data: tokens } = await sb.from('concepts').select('*').eq('state', 'raw').eq('band', 'hermes').order('created_at', { ascending: false }).limit(30);
-        const { data: triplets } = await sb.from('svo_triplets').select('*').eq('state', 'raw').order('created_at', { ascending: false }).limit(30);
+        const { data: allTokens } = await sb.from('concepts')
+            .select('*')
+            .eq('state', 'raw')
+            .eq('band', 'hermes')
+            .order('created_at', { ascending: false })
+            .limit(60);
 
-        const tokenList = (tokens || []).map(t => ({ type: 'token', id: t.id, text: t.body || t.word || '', embedding: null }));
-        const tripletList = (triplets || []).map(t => ({
-            type: 'svo_triplet', id: t.id,
-            text: `${t.subject || ''} ${t.verb || ''} ${t.object || ''}`.trim(),
-            subject: t.subject, verb: t.verb, object: t.object,
-            embedding: null
-        }));
+        const totalTokens = (allTokens || []).length;
+        
+        const loveTokens = (allTokens || []).filter(t => {
+            const word = (t.body || t.word || '').toLowerCase();
+            return isLoveToken(word);
+        });
 
-        allItems = [...tokenList, ...tripletList];
+        const { data: allTriplets } = await sb.from('svo_triplets')
+            .select('*')
+            .eq('state', 'raw')
+            .order('created_at', { ascending: false })
+            .limit(30);
 
-        if (modelReady) {
-            log(`Embedding ${allItems.length} items...`);
-            for (const item of allItems) {
+        const loveTriplets = (allTriplets || []).filter(t => {
+            const s = (t.subject || '').toLowerCase();
+            const v = (t.verb || '').toLowerCase();
+            const o = (t.object || '').toLowerCase();
+            return isLoveToken(s) || isLoveToken(v) || isLoveToken(o);
+        });
+
+        const items = [
+            ...loveTokens.map(t => ({ 
+                type: 'token', id: t.id, 
+                text: t.body || t.word || '',
+                wordType: t.word_type || tagLoveWord(t.body || ''),
+                embedding: null 
+            })),
+            ...loveTriplets.map(t => ({
+                type: 'svo_triplet', id: t.id,
+                text: `${t.subject || ''} ${t.verb || ''} ${t.object || ''}`.trim(),
+                subject: t.subject, verb: t.verb, object: t.object,
+                embedding: null
+            }))
+        ];
+
+        loveItems = items;
+
+        if (modelReady && loveItems.length > 0) {
+            log(`Embedding ${loveItems.length} love items...`);
+            for (const item of loveItems) {
                 item.embedding = await embed_text(item.text);
             }
         }
 
-        document.getElementById('tokenCount').textContent = tokenList.length;
-        document.getElementById('tripletCount').textContent = tripletList.length;
-        document.getElementById('pairBtn').disabled = false;
-        log(`✓ Fetched ${tokenList.length} tokens + ${tripletList.length} triplets`);
+        document.getElementById('tokenCount').textContent = loveTokens.length;
+        document.getElementById('tripletCount').textContent = loveTriplets.length;
+        document.getElementById('pairBtn').disabled = loveItems.length < 2;
+        
+        const released = totalTokens - loveTokens.length;
+        log(`💗 ${loveTokens.length} love tokens kept · ${released} non-love tokens released · ${loveTriplets.length} love triplets found`);
 
     } catch (err) {
         log(`Fetch error: ${err.message}`);
     }
 
     document.getElementById('fetchBtn').disabled = false;
-    document.getElementById('fetchBtn').textContent = '📥 Fetch from Hermes + Demeter';
+    document.getElementById('fetchBtn').textContent = '💗 Fetch Love Tokens from Hermes';
 }
 
-async function scoreBeauty(text) {
-    if (!modelReady || !beautyEmbeddings.length) return 0.5;
-    const emb = await embed_text(text);
-    if (!emb) return 0.5;
-    const sims = beautyEmbeddings.map(b => cosineSim(emb, b));
-    return sims.reduce((a, b) => a + b, 0) / sims.length;
-}
-
-async function initBeautyAnchors() {
-    if (!modelReady) return;
-    for (const anchor of BEAUTY_ANCHORS) {
-        const emb = await embed_text(anchor);
-        if (emb) beautyEmbeddings.push(emb);
+// ════════════════════════════════════════════════
+// LOVE LETTER COMPOSITION
+// ════════════════════════════════════════════════
+function composeLetter(itemA, itemB, desire, attraction, beauty, tension) {
+    const a = itemA.text;
+    const b = itemB.text;
+    
+    let narrative;
+    if (desire >= 85) {
+        narrative = "This is the kind of love that changes the shape of things. What was separate becomes inseparable.";
+    } else if (desire >= 70) {
+        narrative = "What seeks itself in another has already begun to bloom. The distance between them is already closing.";
+    } else if (desire >= 55) {
+        narrative = "Even the gentlest pull is still a pull toward something true. Not all love shouts — some love whispers.";
+    } else {
+        narrative = "Not every resonance becomes a love story. But every love story begins with a resonance.";
     }
+    
+    return {
+        triplet_a: a,
+        triplet_b: b,
+        couplet: `${capitalize(a)} —
+${capitalize(b)}.`,
+        narrative,
+        desire_score: desire,
+        attraction_score: attraction,
+        beauty_score: beauty,
+        tension_score: tension
+    };
 }
 
+function capitalize(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ════════════════════════════════════════════════
+// FIND PAIRS → COMPOSE LOVE LETTERS
+// ════════════════════════════════════════════════
 async function findPairs() {
-    if (allItems.length < 2) { log('Need at least 2 items to pair'); return; }
-    log('Finding pairs by desire...');
+    if (loveItems.length < 2) { log('Need at least 2 love items to compose'); return; }
+    log('Composing love letters...');
     document.getElementById('pairBtn').disabled = true;
-    document.getElementById('pairBtn').innerHTML = '<span class="spin">⟳</span> Pairing...';
-    pairs = [];
+    document.getElementById('pairBtn').innerHTML = '<span class="spin">⟳</span> Composing...';
+    loveLetters = [];
 
-    await initBeautyAnchors();
-
-    for (let i = 0; i < allItems.length; i++) {
-        for (let j = i + 1; j < allItems.length; j++) {
-            const a = allItems[i], b = allItems[j];
+    for (let i = 0; i < loveItems.length; i++) {
+        for (let j = i + 1; j < loveItems.length; j++) {
+            const a = loveItems[i], b = loveItems[j];
             const sim = modelReady && a.embedding && b.embedding
                 ? cosineSim(a.embedding, b.embedding)
                 : 0.5 + (Math.random() * 0.2 - 0.1);
 
-            if (sim >= 0.30 && sim <= 0.75) {
+            // Aphrodite's sweet spot: 0.35-0.70 similarity
+            if (sim >= 0.35 && sim <= 0.70) {
                 const tension = 1 - Math.abs(sim - 0.50);
-                const beauty = modelReady ? await scoreBeauty(a.text + ' ' + b.text) : 0.5;
-                const desire = Math.round((sim * 40) + (tension * 35) + (beauty * 25));
+                const beauty = sim * 0.8 + 0.2; // simplified beauty score
+                const attraction = Math.round(sim * 100);
+                const tensionScore = Math.round(tension * 100);
+                const beautyScore = Math.round(beauty * 100);
+                const desire = Math.round((attraction * 0.4) + (tensionScore * 0.35) + (beautyScore * 0.25));
 
-                let pairType = `${a.type}-${b.type}`;
-                if (a.type === 'svo_triplet' && b.type === 'svo_triplet') {
-                    if (a.verb === b.verb) pairType = 'verb-verb';
-                    else if (a.subject === b.object || a.object === b.subject) pairType = 'subject-object';
-                }
-
-                pairs.push({
-                    item_a_type: a.type, item_a_id: a.id, item_a_text: a.text,
-                    item_b_type: b.type, item_b_id: b.id, item_b_text: b.text,
-                    attraction_score: Math.round(sim * 100),
-                    tension_score: Math.round(tension * 100),
-                    beauty_score: Math.round(beauty * 100),
-                    desire_score: desire,
-                    pair_type: pairType,
-                    state: 'raw'
-                });
+                loveLetters.push(
+                    composeLetter(a, b, desire, attraction, beautyScore, tensionScore)
+                );
             }
         }
     }
 
-    pairs.sort((a, b) => b.desire_score - a.desire_score);
-    pairs = pairs.slice(0, 24);
+    loveLetters.sort((a, b) => b.desire_score - a.desire_score);
+    loveLetters = loveLetters.slice(0, 20);
 
-    document.getElementById('pairCount').textContent = pairs.length;
-    document.getElementById('dispatchBtn').disabled = pairs.length === 0;
-    renderPairs();
-    log(`✓ Found ${pairs.length} pairs by desire`);
+    document.getElementById('pairCount').textContent = loveLetters.length;
+    document.getElementById('dispatchBtn').disabled = loveLetters.length === 0;
+    renderLetters();
+    log(`💗 Composed ${loveLetters.length} love letters`);
     document.getElementById('pairBtn').disabled = false;
-    document.getElementById('pairBtn').textContent = '💗 Find Pairs';
+    document.getElementById('pairBtn').textContent = '💗 Compose Couplets';
 }
 
-function renderPairs() {
-    const grid = document.getElementById('pairsGrid');
-    if (!pairs.length) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted);font-style:italic;">No pairs yet. Find what desires what.</div>';
+// ════════════════════════════════════════════════
+// RENDER LOVE LETTERS
+// ════════════════════════════════════════════════
+function renderLetters() {
+    const grid = document.getElementById('lettersGrid');
+    if (!loveLetters.length) {
+        grid.innerHTML = '<div class="empty-state">No love letters yet. Find what desires what.</div>';
         return;
     }
-    grid.innerHTML = pairs.map((p, i) => {
-        const d = p.desire_score;
-        const dClass = d >= 80 ? 'high' : d >= 60 ? 'med' : 'low';
+    grid.innerHTML = loveLetters.map((l, i) => {
+        const d = l.desire_score;
+        const dColor = d >= 80 ? 'var(--desire-high)' : d >= 60 ? 'var(--desire-med)' : 'var(--desire-low)';
         return `
-            <div class="pair-card ${p.pair_type}">
-                <div class="pair-head">
-                    <span class="pair-tag">${p.pair_type}</span>
-                    <span class="pair-desire" style="color:${d>=80?'var(--desire-high)':d>=60?'var(--desire-med)':'var(--desire-low)'}">${d}</span>
-                </div>
-                <div class="pair-items">
-                    <span class="pair-item-a">${esc(p.item_a_text)}</span>
-                    <span class="pair-connector">+</span>
-                    <span class="pair-item-b">${esc(p.item_b_text)}</span>
-                </div>
-                <div class="pair-scores">
-                    <div>attraction<span class="score-val">${p.attraction_score}</span></div>
-                    <div>tension<span class="score-val">${p.tension_score}</span></div>
-                    <div>beauty<span class="score-val">${p.beauty_score}</span></div>
+            <div class="letter-card">
+                <div class="letter-couplet">${esc(l.couplet)}</div>
+                <div class="letter-narrative">${esc(l.narrative)}</div>
+                <div class="letter-scores">
+                    <span>attraction ${l.attraction_score}</span>
+                    <span>beauty ${l.beauty_score}</span>
+                    <span>tension ${l.tension_score}</span>
+                    <span class="letter-desire" style="color:${dColor}">${d}</span>
                 </div>
             </div>
         `;
     }).join('');
 }
 
+// ════════════════════════════════════════════════
+// DISPATCH TO APOLLO
+// ════════════════════════════════════════════════
 async function dispatchToAres() {
-    if (!pairs.length) return;
-    log('Dispatching pairs to Ares...');
+    if (!loveLetters.length) return;
+    log('💌 Sending love letters to Apollo...');
     document.getElementById('dispatchBtn').disabled = true;
+    document.getElementById('dispatchBtn').textContent = '💌 Sending...';
 
     let dispatched = 0;
-    for (const p of pairs) {
-        const { error } = await sb.from('aphrodite_pairs').insert({
-            item_a_type: p.item_a_type, item_a_id: p.item_a_id, item_a_text: p.item_a_text,
-            item_b_type: p.item_b_type, item_b_id: p.item_b_id, item_b_text: p.item_b_text,
-            attraction_score: p.attraction_score,
-            beauty_score: p.beauty_score,
-            tension_score: p.tension_score,
-            desire_score: p.desire_score,
-            pair_type: p.pair_type,
-            state: 'raw',
+    for (const letter of loveLetters) {
+        const { error } = await sb.from('aphrodite_dispatch').insert({
+            triplet_a: letter.triplet_a,
+            triplet_b: letter.triplet_b,
+            couplet: letter.couplet,
+            narrative: letter.narrative,
+            desire_score: letter.desire_score,
+            attraction_score: letter.attraction_score,
+            beauty_score: letter.beauty_score,
+            tension_score: letter.tension_score,
+            consumed: false,
             created_at: new Date().toISOString()
         });
         if (!error) dispatched++;
     }
 
     document.getElementById('dispatchCount').textContent = dispatched;
-    log(`✓ Dispatched ${dispatched} pairs to aphrodite_pairs — Ares awaits`);
+    log(`💌 ${dispatched} love letters sent to aphrodite_dispatch — Apollo may now read them`);
+    document.getElementById('dispatchBtn').disabled = false;
+    document.getElementById('dispatchBtn').textContent = '💌 Send Love Letters to Apollo';
 }
 
+// ════════════════════════════════════════════════
+// SELF-ARCHIVE
+// ════════════════════════════════════════════════
 async function archiveSelf() {
     const html = document.documentElement.outerHTML;
     await sb.from('html').upsert({
         filename: 'aphrodite.html',
-        title: '💗 Aphrodite · Desire Pairing Engine',
+        title: '💗 Aphrodite · Love Letter Composer',
         type: 'olympian',
         content: html,
-        description: 'Pairs raw tokens and SVO triplets by desire, beauty, and attraction. Feeds Ares.',
+        description: 'Filters Hermes tokens for love domain, composes couplets, dispatches love letters to Apollo',
         reads_from: ['concepts', 'svo_triplets'],
-        writes_to: ['aphrodite_pairs'],
+        writes_to: ['aphrodite_dispatch'],
         models_used: ['Xenova/all-MiniLM-L6-v2'],
         url: window.location.href,
         updated_at: new Date().toISOString()
@@ -346,13 +598,16 @@ async function archiveSelf() {
 
 function esc(s) { return String(s||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]); }
 
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
 function init() {
     document.getElementById('fetchBtn').addEventListener('click', fetchAll);
     document.getElementById('pairBtn').addEventListener('click', findPairs);
     document.getElementById('dispatchBtn').addEventListener('click', dispatchToAres);
     loadModel();
     setTimeout(archiveSelf, 3000);
-    log('💗 Aphrodite initialized — Pythagorean #2, the Dyad');
+    log('💗 Aphrodite — Pythagorean #2, the Dyad. She knows what love looks like.');
 }
 init();
 </script>
