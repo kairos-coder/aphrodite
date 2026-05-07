@@ -3,90 +3,568 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💗 Aphrodite · Love Letter Composer</title>
+    <title>APHRODITE · Temple of Love</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="importmap">
         { "imports": { "@xenova/transformers": "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js" } }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel+Decorative:wght@400;700;900&family=JetBrains+Mono:wght@300;400&display=swap');
+
         :root {
-            --bg: #1a1418; --panel: #241c22; --border: #3a2a38;
-            --text: #e8d8e0; --muted: #9a7a8a; --aphrodite: #b05870;
-            --rose: #c06078; --rose-light: #e8c0d0; --gold: #c8943a;
-            --desire-high: #e87890; --desire-med: #c06078; --desire-low: #8a4060;
-            --font-display: 'Cinzel', serif; --font-body: 'Crimson Pro', serif; --font-mono: 'JetBrains Mono', monospace;
+            --obsidian: #0e0b0f;
+            --stone: #1c1520;
+            --altar: #261c24;
+            --veil: #35233a;
+            --border: #4a2e42;
+            --rose-deep: #7a2a40;
+            --rose: #a03850;
+            --rose-bright: #c84e68;
+            --rose-light: #e8a0b0;
+            --gold: #c8943a;
+            --gold-pale: #e8c878;
+            --ivory: #f0e8d8;
+            --muted: #786070;
+            --font-temple: 'Cinzel Decorative', serif;
+            --font-body: 'Cormorant Garamond', serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); font-family: var(--font-body); color: var(--text); min-height: 100vh; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
 
-        .header { text-align: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1.2rem; }
-        .header h1 { font-family: var(--font-display); font-size: 2.2rem; color: var(--aphrodite); letter-spacing: 3px; }
-        .header h1 span { color: var(--text); }
-        .header-sub { font-family: var(--font-mono); font-size: 0.55rem; color: var(--muted); letter-spacing: 2px; margin-top: 0.3rem; }
+        body {
+            background: var(--obsidian);
+            font-family: var(--font-body);
+            color: var(--ivory);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        .status-bar { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; font-family: var(--font-mono); font-size: 0.55rem; color: var(--muted); }
-        .status-bar span { color: var(--text); font-size: 0.65rem; }
+        /* ── TEMPLE BACKGROUND ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 50% 0%, rgba(160,56,80,0.15) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 100%, rgba(200,148,58,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 30% 40% at 20% 60%, rgba(120,42,64,0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-        .controls { display: flex; gap: 0.4rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
-        button { font-family: var(--font-mono); font-size: 0.6rem; padding: 0.45rem 0.9rem; border-radius: 4px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); transition: all 0.2s; letter-spacing: 1px; }
-        button:hover:not(:disabled) { background: var(--aphrodite); color: #fff; border-color: var(--aphrodite); }
-        button.primary { background: var(--aphrodite); color: #fff; border-color: var(--aphrodite); }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        /* ── COLUMN DECORATIONS ── */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--rose-deep), var(--gold), var(--rose-deep), transparent);
+            z-index: 100;
+        }
+
+        .temple-columns {
+            position: fixed;
+            top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--gold) 0%, var(--rose-deep) 40%, transparent 100%);
+            opacity: 0.3;
+            z-index: 0;
+        }
+        .temple-columns.left { left: 2rem; }
+        .temple-columns.right { right: 2rem; }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 3rem 4rem;
+        }
+
+        /* ── HEADER / PEDIMENT ── */
+        .pediment {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            position: relative;
+        }
+
+        .pediment::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--rose-bright), var(--gold), transparent);
+        }
+
+        .temple-name {
+            font-family: var(--font-temple);
+            font-size: clamp(2rem, 5vw, 3.8rem);
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: var(--rose-bright);
+            text-shadow: 0 0 40px rgba(200,78,104,0.4), 0 0 80px rgba(200,78,104,0.15);
+            margin-bottom: 0.4rem;
+            animation: templeGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes templeGlow {
+            from { text-shadow: 0 0 30px rgba(200,78,104,0.3), 0 0 60px rgba(200,78,104,0.1); }
+            to   { text-shadow: 0 0 50px rgba(200,78,104,0.6), 0 0 100px rgba(200,78,104,0.25), 0 0 150px rgba(200,78,104,0.08); }
+        }
+
+        .temple-subtitle {
+            font-family: var(--font-body);
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--gold-pale);
+            letter-spacing: 3px;
+            opacity: 0.8;
+            margin-bottom: 0.6rem;
+        }
+
+        .temple-epithet {
+            font-family: var(--font-mono);
+            font-size: 0.5rem;
+            color: var(--muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* ── ORACLE STRIP ── */
+        .oracle-strip {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2.5rem;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(74,46,66,0.4);
+            border-bottom: 1px solid rgba(74,46,66,0.4);
+            flex-wrap: wrap;
+        }
+
+        .oracle-stat {
+            text-align: center;
+        }
+
+        .oracle-stat-value {
+            font-family: var(--font-temple);
+            font-size: 1.4rem;
+            color: var(--rose-bright);
+            display: block;
+            line-height: 1;
+        }
+
+        .oracle-stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.45rem;
+            color: var(--muted);
+            letter-spacing: 2px;
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        /* ── VOCABULARY FRIEZE ── */
+        .frieze {
+            background: linear-gradient(135deg, var(--stone), var(--altar));
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .frieze::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--rose-deep), transparent);
+        }
+
+        .frieze-title {
+            font-family: var(--font-mono);
+            font-size: 0.45rem;
+            letter-spacing: 3px;
+            color: var(--muted);
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .token-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            min-height: 2rem;
+        }
+
+        .token-chip {
+            font-family: var(--font-body);
+            font-style: italic;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 1px;
+            background: rgba(160,56,80,0.12);
+            color: var(--rose-light);
+            border: 1px solid rgba(160,56,80,0.25);
+            transition: all 0.2s;
+        }
+
+        .token-chip:hover {
+            background: rgba(160,56,80,0.25);
+            border-color: var(--rose);
+        }
+
+        .token-chip.counter {
+            background: rgba(200,148,58,0.1);
+            color: var(--gold-pale);
+            border-color: rgba(200,148,58,0.2);
+        }
+
+        /* ── RITUAL CONTROLS ── */
+        .ritual-controls {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 0.7rem 1.6rem;
+            border-radius: 1px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--stone);
+            color: var(--muted);
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(200,78,104,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .btn:hover:not(:disabled)::before { opacity: 1; }
+
+        .btn:hover:not(:disabled) {
+            border-color: var(--rose);
+            color: var(--rose-light);
+        }
+
+        .btn.primary {
+            border-color: var(--rose);
+            background: linear-gradient(135deg, var(--rose-deep), var(--veil));
+            color: var(--rose-light);
+        }
+
+        .btn.primary:hover:not(:disabled) {
+            border-color: var(--rose-bright);
+            color: var(--ivory);
+            box-shadow: 0 0 20px rgba(200,78,104,0.2);
+        }
+
+        .btn.gold {
+            border-color: rgba(200,148,58,0.4);
+            color: var(--gold-pale);
+        }
+
+        .btn.gold:hover:not(:disabled) {
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(200,148,58,0.15);
+        }
+
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
         .spin { display: inline-block; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .vocab-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; margin-bottom: 1.5rem; }
-        .vocab-title { font-family: var(--font-mono); font-size: 0.5rem; letter-spacing: 2px; color: var(--muted); margin-bottom: 0.5rem; }
-        .vocab-cloud { display: flex; flex-wrap: wrap; gap: 0.25rem; }
-        .vocab-chip { font-family: var(--font-mono); font-size: 0.5rem; padding: 0.12rem 0.35rem; border-radius: 3px; background: rgba(176,88,112,0.1); color: var(--rose-light); border: 1px solid rgba(176,88,112,0.2); }
+        /* ── PAIRS SANCTUM ── */
+        .sanctum-title {
+            font-family: var(--font-body);
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--gold-pale);
+            letter-spacing: 2px;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            opacity: 0.7;
+        }
 
-        .letters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 0.8rem; margin-bottom: 1.5rem; }
-        .letter-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; border-left: 4px solid var(--aphrodite); transition: all 0.2s; }
-        .letter-card:hover { border-color: var(--rose); transform: translateY(-1px); }
-        .letter-couplet { font-family: var(--font-body); font-size: 0.9rem; font-style: italic; line-height: 1.6; color: var(--rose-light); margin-bottom: 0.6rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
-        .letter-narrative { font-family: var(--font-body); font-size: 0.72rem; color: var(--muted); font-style: italic; line-height: 1.4; margin-bottom: 0.5rem; }
-        .letter-scores { display: flex; gap: 0.8rem; font-family: var(--font-mono); font-size: 0.48rem; color: var(--muted); }
-        .letter-desire { margin-left: auto; font-family: var(--font-display); font-size: 1rem; }
+        .pairs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
 
-        .log { background: #0d0a10; border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; max-height: 120px; overflow-y: auto; font-family: var(--font-mono); font-size: 0.5rem; color: var(--muted); }
-        .empty-state { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--muted); font-style: italic; }
+        .pair-card {
+            background: linear-gradient(160deg, var(--stone) 0%, var(--altar) 100%);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 1.3rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            animation: cardRise 0.4s ease both;
+        }
 
-        @media (max-width: 768px) { .letters-grid { grid-template-columns: 1fr; } }
+        @keyframes cardRise {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .pair-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--rose-deep), var(--rose-bright), var(--rose-deep));
+            opacity: 0.6;
+        }
+
+        .pair-card.counter-domain::before {
+            background: linear-gradient(90deg, var(--rose-deep), var(--gold), var(--rose-deep));
+        }
+
+        .pair-card:hover {
+            border-color: var(--rose);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(160,56,80,0.15);
+        }
+
+        .pair-union {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .pair-word {
+            font-family: var(--font-body);
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--rose-light);
+            flex: 1;
+        }
+
+        .pair-word.b { text-align: right; color: var(--ivory); }
+
+        .pair-connector {
+            font-family: var(--font-temple);
+            font-size: 0.6rem;
+            color: var(--rose);
+            letter-spacing: 2px;
+            flex-shrink: 0;
+        }
+
+        .pair-counter-badge {
+            font-family: var(--font-mono);
+            font-size: 0.4rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            border: 1px solid rgba(200,148,58,0.3);
+            padding: 0.1rem 0.4rem;
+            margin-bottom: 0.6rem;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .pair-type-badge {
+            font-family: var(--font-mono);
+            font-size: 0.4rem;
+            letter-spacing: 2px;
+            color: var(--muted);
+            border: 1px solid rgba(74,46,66,0.5);
+            padding: 0.1rem 0.4rem;
+            margin-bottom: 0.6rem;
+            display: inline-block;
+            margin-left: 0.4rem;
+        }
+
+        .pair-scores {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 0.8rem;
+            padding-top: 0.6rem;
+            border-top: 1px solid rgba(74,46,66,0.4);
+        }
+
+        .pair-score-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .pair-score-value {
+            font-family: var(--font-temple);
+            font-size: 1rem;
+            display: block;
+            line-height: 1;
+        }
+
+        .pair-score-label {
+            font-family: var(--font-mono);
+            font-size: 0.38rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+            display: block;
+            margin-top: 0.2rem;
+            text-transform: uppercase;
+        }
+
+        .affinity-high { color: var(--rose-bright); }
+        .affinity-med  { color: var(--rose); }
+        .affinity-low  { color: var(--muted); }
+
+        .tension-high { color: var(--gold); }
+        .tension-low  { color: var(--muted); }
+
+        .empty-sanctum {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+        }
+
+        .empty-sanctum .empty-glyph {
+            font-family: var(--font-temple);
+            font-size: 2.5rem;
+            color: var(--rose-deep);
+            display: block;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        .empty-sanctum p {
+            font-style: italic;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        /* ── ORACLE LOG ── */
+        .oracle-log {
+            background: rgba(10, 7, 12, 0.8);
+            border: 1px solid rgba(74,46,66,0.3);
+            border-radius: 2px;
+            padding: 0.8rem;
+            max-height: 130px;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.48rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .oracle-log::-webkit-scrollbar { width: 4px; }
+        .oracle-log::-webkit-scrollbar-track { background: transparent; }
+        .oracle-log::-webkit-scrollbar-thumb { background: var(--rose-deep); border-radius: 2px; }
+
+        .log-line { padding: 0.1rem 0; }
+        .log-line.success { color: var(--rose-light); }
+        .log-line.warn    { color: var(--gold-pale); }
+        .log-line.err     { color: #e87878; }
+
+        /* ── DECORATIVE DIVIDER ── */
+        .temple-divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--rose-deep);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            letter-spacing: 8px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 2rem 1.5rem; }
+            .pairs-grid { grid-template-columns: 1fr; }
+            .oracle-strip { gap: 1.5rem; }
+            .temple-columns { display: none; }
+        }
     </style>
 </head>
 <body>
+
+<div class="temple-columns left"></div>
+<div class="temple-columns right"></div>
+
 <div class="container">
 
-    <div class="header">
-        <h1>💗 APHRO<span>DITE</span></h1>
-        <div class="header-sub">LOVE LETTER COMPOSER · DOMAIN: LOVE · PYTHAGOREAN #2 · THE DYAD</div>
+    <!-- PEDIMENT -->
+    <header class="pediment">
+        <div class="temple-name">APHRODITE</div>
+        <div class="temple-subtitle">She Who Binds — Temple of the Sacred Pair</div>
+        <div class="temple-epithet">PYTHAGOREAN DYAD · DOMAIN: LOVE · PAIRS ARCHITECT</div>
+    </header>
+
+    <!-- ORACLE STATS -->
+    <div class="oracle-strip">
+        <div class="oracle-stat">
+            <span class="oracle-stat-value" id="tokenCount">—</span>
+            <span class="oracle-stat-label">Tokens in Temple</span>
+        </div>
+        <div class="oracle-stat">
+            <span class="oracle-stat-value" id="vocabSize">—</span>
+            <span class="oracle-stat-label">Claimed</span>
+        </div>
+        <div class="oracle-stat">
+            <span class="oracle-stat-value" id="pairCount">—</span>
+            <span class="oracle-stat-label">Pairs Formed</span>
+        </div>
+        <div class="oracle-stat">
+            <span class="oracle-stat-value" id="counterCount">—</span>
+            <span class="oracle-stat-label">Counter-Domain</span>
+        </div>
+        <div class="oracle-stat">
+            <span class="oracle-stat-value" id="dispatchCount">—</span>
+            <span class="oracle-stat-label">Sent to Ares</span>
+        </div>
     </div>
 
-    <div class="status-bar">
-        <div>Tokens claimed: <span id="tokenCount">—</span></div>
-        <div>Vocabulary: <span id="vocabSize">—</span></div>
-        <div>Letters: <span id="letterCount">—</span></div>
-        <div>Dispatched: <span id="dispatchCount">—</span></div>
+    <!-- TOKEN FRIEZE -->
+    <div class="frieze">
+        <div class="frieze-title">⟡ Claimed Tokens</div>
+        <div class="token-cloud" id="tokenCloud">
+            <span style="font-style:italic; color:var(--muted); font-size:0.8rem;">Summon tokens from Hermes to begin the rite.</span>
+        </div>
     </div>
 
-    <div class="vocab-panel">
-        <div class="vocab-title">💗 MY LOVE VOCABULARY</div>
-        <div class="vocab-cloud" id="vocabCloud">Claim tokens from Hermes to build vocabulary.</div>
+    <!-- RITUAL CONTROLS -->
+    <div class="ritual-controls">
+        <button class="btn primary" id="claimBtn">♀ Summon Tokens</button>
+        <button class="btn" id="pairBtn" disabled>⟡ Form Pairs</button>
+        <button class="btn gold" id="dispatchBtn" disabled>⚔ Send to Ares</button>
+        <button class="btn" id="clearBtn">✕ Clear Consumed</button>
     </div>
 
-    <div class="controls">
-        <button id="claimBtn" class="primary">💗 Claim Love Tokens</button>
-        <button id="composeBtn" disabled>💗 Compose Couplets</button>
-        <button id="dispatchBtn" disabled>💌 Send to Apollo</button>
+    <div class="temple-divider">· · · · · ♀ · · · · ·</div>
+
+    <!-- PAIRS SANCTUM -->
+    <div class="sanctum-title">The Sanctum of Pairs</div>
+
+    <div class="pairs-grid" id="pairsGrid">
+        <div class="empty-sanctum">
+            <span class="empty-glyph">♀</span>
+            <p>The temple awaits.<br>Summon tokens, then perform the binding rite.</p>
+        </div>
     </div>
 
-    <div class="letters-grid" id="lettersGrid">
-        <div class="empty-state">Claim love tokens from Hermes, then compose letters.</div>
+    <!-- ORACLE LOG -->
+    <div class="oracle-log" id="oracleLog">
+        <div class="log-line">♀ Aphrodite stirs. The temple is ready.</div>
     </div>
-
-    <div class="log" id="log"><div>💗 Aphrodite waiting.</div></div>
 
 </div>
 
@@ -100,232 +578,334 @@ env.allowLocalModels = true;
 env.useBrowserCache = true;
 
 let embedder = null;
-let myVocab = [];
-let loveLetters = [];
+let claimedTokens = [];  // { id, body, word_type, domain, counter_domain, embedding, image_score, visual_mood, score }
+let formedPairs = [];
 
-const LOVE_SEEDS = new Set([
-    'love','heart','beauty','desire','grace','kiss','embrace','sweet','tender',
-    'bloom','rose','charm','passion','romance','soul','union','devotion','adore',
-    'cherish','beloved','soft','warm','garden','radiant','luminous','golden',
-    'harmony','joy','delight','pleasure','bliss','enchant','captivate','muse'
-]);
-
-const LOVE_PATTERNS = [
-    (a, b) => `${a} ${b} — what moves together, stays together.`,
-    (a, b) => `${a} meets ${b} — and the world softens.`,
-    (a, b) => `${a} and ${b} — this is how love begins.`,
-    (a, b) => `Where ${a} touches ${b}, beauty blooms.`,
-    (a, b) => `${a} calls to ${b} — the oldest song, sung again.`,
-    (a, b) => `In the space between ${a} and ${b}, desire lives.`,
-    (a, b) => `${a} holds ${b} — and everything else falls away.`,
-    (a, b) => `${a} whispers to ${b} — only the heart can hear.`
-];
-
-function log(msg) {
-    const el = document.getElementById('log');
-    el.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + el.innerHTML;
-    while (el.children.length > 30) el.removeChild(el.lastChild);
-}
-
+// ── MODEL ──────────────────────────────────────────
 async function loadModel() {
     try {
         embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-        log('MiniLM ready.');
-    } catch (err) {
-        log('Model offline — using string affinity.');
+        log('MiniLM loaded — semantic affinity active.', 'success');
+    } catch {
+        log('MiniLM offline — using score-based affinity.', 'warn');
     }
 }
 
-async function embed_text(text) {
+async function getEmbedding(text) {
     if (!embedder) return null;
-    const result = await embedder(text, { pooling: 'mean', normalize: true });
-    return Array.from(result.data);
+    const r = await embedder(text, { pooling: 'mean', normalize: true });
+    return Array.from(r.data);
 }
 
 function cosineSim(a, b) {
-    if (!a || !b) return 0;
+    if (!a || !b || a.length !== b.length) return 0;
     let dot = 0, na = 0, nb = 0;
-    for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
-    return dot / (Math.sqrt(na) * Math.sqrt(nb));
+    for (let i = 0; i < a.length; i++) {
+        dot += a[i] * b[i];
+        na  += a[i] * a[i];
+        nb  += b[i] * b[i];
+    }
+    const denom = Math.sqrt(na) * Math.sqrt(nb);
+    return denom === 0 ? 0 : dot / denom;
 }
 
-// ════════════════════════════════════════════════
-// CLAIM LOVE TOKENS FROM HERMES
-// ════════════════════════════════════════════════
+// ── CLAIM TOKENS ───────────────────────────────────
 async function claimTokens() {
-    log('Claiming love tokens from Hermes...');
-    document.getElementById('claimBtn').disabled = true;
-    document.getElementById('claimBtn').innerHTML = '<span class="spin">⟳</span> Claiming...';
+    setBusy('claimBtn', '⟳ Summoning...');
+    log('Summoning tokens from Hermes...');
 
-    const { data: tokens } = await sb.from('concepts')
-        .select('*')
-        .eq('domain', 'love')
-        .eq('state', 'raw')
-        .eq('band', 'hermes')
+    // Fetch all usable tokens — not charon-marked, not expired
+    const { data: tokens, error } = await sb
+        .from('tokens')
+        .select('id, body, word_type, domain, counter_domain, embedding, image_score, visual_mood, score, metadata')
+        .eq('charon', false)
+        .gt('expires_at', new Date().toISOString())
         .order('score', { ascending: false })
-        .limit(40);
+        .limit(80);
 
-    if (!tokens?.length) {
-        log('No love tokens available. Run Hermes → Seed All Domains first.');
-        document.getElementById('claimBtn').disabled = false;
-        document.getElementById('claimBtn').textContent = '💗 Claim Love Tokens';
+    if (error || !tokens?.length) {
+        log(`No tokens available: ${error?.message || 'empty result'}`, 'err');
+        clearBusy('claimBtn', '♀ Summon Tokens');
         return;
     }
 
-    // Score by hardcoded love logic + semantic similarity to existing vocab
-    const scored = [];
-    for (const t of tokens) {
-        const word = (t.body || '').toLowerCase();
-        const embedding = t.metadata?.embedding || await embed_text(word);
-        
-        const hardcodedBoost = LOVE_SEEDS.has(word) ? 0.4 : 0;
-        const seedSimilarity = myVocab.length > 0 && embedding
-            ? Math.max(...myVocab.map(v => v.embedding ? cosineSim(embedding, v.embedding) : 0))
-            : 0.25;
-        const loveScore = hardcodedBoost + (seedSimilarity * 0.6);
-        
-        scored.push({ word, embedding, loveScore, id: t.id, wordType: t.word_type || '—' });
-    }
+    // Deduplicate against already claimed
+    const existingBodies = new Set(claimedTokens.map(t => t.body));
+    const fresh = tokens.filter(t => !existingBodies.has(t.body));
 
-    scored.sort((a, b) => b.loveScore - a.loveScore);
-    const claimed = scored.slice(0, 20);
-
-    for (const c of claimed) {
-        if (!myVocab.find(v => v.word === c.word)) {
-            myVocab.push({ word: c.word, embedding: c.embedding, loveScore: c.loveScore });
+    // Enrich with embeddings if model is live
+    for (const t of fresh) {
+        if (!t.embedding && embedder) {
+            t.embedding = await getEmbedding(t.body);
         }
-        await sb.from('concepts').update({ state: 'claimed', realm: 'aphrodite' }).eq('id', c.id);
+        claimedTokens.push(t);
     }
 
-    document.getElementById('tokenCount').textContent = tokens.length;
-    document.getElementById('vocabSize').textContent = myVocab.length;
-    document.getElementById('composeBtn').disabled = myVocab.length < 4;
-    renderVocab();
-    log(`Claimed ${claimed.length} love tokens. Vocabulary: ${myVocab.length} words.`);
-    document.getElementById('claimBtn').disabled = false;
-    document.getElementById('claimBtn').textContent = '💗 Claim Love Tokens';
+    updateStats();
+    renderTokenCloud();
+    document.getElementById('pairBtn').disabled = claimedTokens.length < 2;
+    log(`Claimed ${fresh.length} tokens. Total in temple: ${claimedTokens.length}.`, 'success');
+    clearBusy('claimBtn', '♀ Summon Tokens');
 }
 
-// ════════════════════════════════════════════════
-// COMPOSE LOVE LETTERS
-// ════════════════════════════════════════════════
-async function composeLetters() {
-    if (myVocab.length < 4) { log('Need at least 4 love words.'); return; }
-    log('Composing love letters...');
-    document.getElementById('composeBtn').disabled = true;
-    document.getElementById('composeBtn').innerHTML = '<span class="spin">⟳</span> Composing...';
-    loveLetters = [];
+// ── FORM PAIRS ─────────────────────────────────────
+async function formPairs() {
+    if (claimedTokens.length < 2) { log('Need at least 2 tokens to form pairs.', 'warn'); return; }
+    setBusy('pairBtn', '⟳ Binding...');
+    log('Beginning the binding rite...');
+    formedPairs = [];
 
-    const sorted = [...myVocab].sort((a, b) => (b.loveScore || 0) - (a.loveScore || 0));
+    const tokens = [...claimedTokens];
 
-    for (let i = 0; i < sorted.length - 1; i += 2) {
-        const a = sorted[i], b = sorted[i + 1];
-        if (!a || !b) break;
+    // Strategy: pair by affinity — highest scoring with its best semantic match
+    const used = new Set();
 
-        const sim = (a.embedding && b.embedding) ? cosineSim(a.embedding, b.embedding) : 0.5;
-        const hardcodedAffinity = (LOVE_SEEDS.has(a.word) && LOVE_SEEDS.has(b.word)) ? 0.3 : 0;
-        const desire = Math.round((sim * 50) + (hardcodedAffinity * 30) + 20);
+    for (let i = 0; i < tokens.length; i++) {
+        if (used.has(i)) continue;
+        const a = tokens[i];
 
-        const pattern = LOVE_PATTERNS[i % LOVE_PATTERNS.length];
-        const couplet = pattern(a.word, b.word);
+        let bestJ = -1;
+        let bestSim = -1;
 
-        let narrative;
-        if (desire >= 80) narrative = "This is the kind of love that changes the shape of things.";
-        else if (desire >= 65) narrative = "What seeks itself in another has already begun to bloom.";
-        else if (desire >= 50) narrative = "Even the gentlest pull is still a pull toward something true.";
-        else narrative = "Not every resonance becomes a story. But every story begins with resonance.";
+        for (let j = i + 1; j < tokens.length; j++) {
+            if (used.has(j)) continue;
+            const b = tokens[j];
+            const sim = cosineSim(a.embedding, b.embedding);
+            // Prefer cross-domain if counter_domain matches — tension pair
+            const tensionBoost = (a.domain && b.domain && a.counter_domain === b.domain) ? 0.15 : 0;
+            const adjusted = sim + tensionBoost;
+            if (adjusted > bestSim) {
+                bestSim = adjusted;
+                bestJ = j;
+            }
+        }
 
-        loveLetters.push({
-            triplet_a: a.word, triplet_b: b.word, couplet, narrative,
-            desire_score: desire, attraction: Math.round(sim * 100)
+        if (bestJ === -1) {
+            // Grab the next unused token
+            for (let j = i + 1; j < tokens.length; j++) {
+                if (!used.has(j)) { bestJ = j; break; }
+            }
+        }
+
+        if (bestJ === -1) break;
+
+        used.add(i);
+        used.add(bestJ);
+
+        const b = tokens[bestJ];
+        const rawSim = cosineSim(a.embedding, b.embedding);
+        const isCounter = !!(a.counter_domain && a.counter_domain === b.domain);
+        const tensionScore = isCounter ? 0.8 + Math.random() * 0.2 : rawSim * 0.4;
+        const affinityScore = rawSim > 0 ? rawSim : (a.score + b.score) / 200;
+        const pairType = derivePairType(a.word_type, b.word_type);
+        const visualMood = pickVisualMood(a, b);
+
+        formedPairs.push({
+            token_a_id: a.id,
+            token_b_id: b.id,
+            token_a_body: a.body,
+            token_b_body: b.body,
+            affinity_score: parseFloat(affinityScore.toFixed(4)),
+            tension_score: parseFloat(tensionScore.toFixed(4)),
+            domain_a: a.domain || null,
+            domain_b: b.domain || null,
+            counter_domain_pair: isCounter,
+            visual_mood: visualMood,
+            pair_type: pairType,
+            state: 'raw',
+            consumed: false
         });
     }
 
-    document.getElementById('letterCount').textContent = loveLetters.length;
-    document.getElementById('dispatchBtn').disabled = !loveLetters.length;
-    renderLetters();
-    log(`Composed ${loveLetters.length} love letters.`);
-    document.getElementById('composeBtn').disabled = false;
-    document.getElementById('composeBtn').textContent = '💗 Compose Couplets';
+    document.getElementById('dispatchBtn').disabled = !formedPairs.length;
+    renderPairs();
+    updateStats();
+    log(`${formedPairs.length} pairs formed. ${formedPairs.filter(p => p.counter_domain_pair).length} counter-domain tension pairs.`, 'success');
+    clearBusy('pairBtn', '⟡ Form Pairs');
 }
 
-// ════════════════════════════════════════════════
-// DISPATCH TO APOLLO
-// ════════════════════════════════════════════════
-async function dispatchToApollo() {
-    if (!loveLetters.length) return;
-    log('Sending love letters to Apollo...');
-    document.getElementById('dispatchBtn').disabled = true;
-    document.getElementById('dispatchBtn').textContent = '💌 Sending...';
+function derivePairType(wt_a, wt_b) {
+    const normalize = w => {
+        if (!w) return 'unknown';
+        const l = w.toLowerCase();
+        if (l.startsWith('n')) return 'noun';
+        if (l.startsWith('v')) return 'verb';
+        if (l.startsWith('adj') || l === 'j') return 'adj';
+        if (l.startsWith('adv')) return 'adv';
+        return l;
+    };
+    return `${normalize(wt_a)}-${normalize(wt_b)}`;
+}
 
-    let dispatched = 0;
-    for (const letter of loveLetters) {
-        const { error } = await sb.from('aphrodite_dispatch').insert({
-            triplet_a: letter.triplet_a, triplet_b: letter.triplet_b,
-            couplet: letter.couplet, narrative: letter.narrative,
-            desire_score: letter.desire_score, attraction_score: letter.attraction,
-            consumed: false, created_at: new Date().toISOString()
-        });
-        if (!error) dispatched++;
+function pickVisualMood(a, b) {
+    if (a.visual_mood && b.visual_mood) {
+        // Prefer the higher image_score token's mood
+        return (a.image_score || 0) >= (b.image_score || 0) ? a.visual_mood : b.visual_mood;
     }
-
-    document.getElementById('dispatchCount').textContent = dispatched;
-    log(`${dispatched} love letters sent to Apollo.`);
-    document.getElementById('dispatchBtn').disabled = false;
-    document.getElementById('dispatchBtn').textContent = '💌 Send to Apollo';
+    return a.visual_mood || b.visual_mood || null;
 }
 
-function renderVocab() {
-    document.getElementById('vocabCloud').innerHTML = myVocab.slice(0, 40).map(v =>
-        `<span class="vocab-chip">${v.word}</span>`
-    ).join('');
-}
+// ── DISPATCH TO ARES ────────────────────────────────
+async function dispatchToAres() {
+    if (!formedPairs.length) return;
+    setBusy('dispatchBtn', '⟳ Sending...');
+    log('Dispatching pairs to Ares...');
 
-function renderLetters() {
-    const grid = document.getElementById('lettersGrid');
-    if (!loveLetters.length) {
-        grid.innerHTML = '<div class="empty-state">Claim love tokens and compose letters.</div>';
+    const { error } = await sb.from('pairs').insert(formedPairs);
+
+    if (error) {
+        log(`Dispatch failed: ${error.message}`, 'err');
+        clearBusy('dispatchBtn', '⚔ Send to Ares');
         return;
     }
-    grid.innerHTML = loveLetters.map(l => {
-        const d = l.desire_score;
-        const dColor = d >= 80 ? 'var(--desire-high)' : d >= 60 ? 'var(--desire-med)' : 'var(--desire-low)';
-        return `
-            <div class="letter-card">
-                <div class="letter-couplet">${esc(l.couplet)}</div>
-                <div class="letter-narrative">${esc(l.narrative)}</div>
-                <div class="letter-scores">
-                    <span>attraction ${l.attraction}</span>
-                    <span class="letter-desire" style="color:${dColor}">${d}</span>
-                </div>
-            </div>
-        `;
+
+    const count = formedPairs.length;
+    document.getElementById('dispatchCount').textContent = count;
+    log(`${count} pairs written to pairs table. Ares may begin.`, 'success');
+
+    // Clear formed pairs from local state — they're committed
+    formedPairs = [];
+    claimedTokens = [];
+    renderPairs();
+    renderTokenCloud();
+    updateStats();
+    document.getElementById('pairBtn').disabled = true;
+    document.getElementById('dispatchBtn').disabled = true;
+    clearBusy('dispatchBtn', '⚔ Send to Ares');
+}
+
+// ── CLEAR CONSUMED ──────────────────────────────────
+async function clearConsumed() {
+    const { error, count } = await sb
+        .from('pairs')
+        .delete()
+        .eq('consumed', true);
+    if (error) { log(`Clear failed: ${error.message}`, 'err'); return; }
+    log('Consumed pairs cleared from the table.', 'success');
+}
+
+// ── RENDER ──────────────────────────────────────────
+function renderTokenCloud() {
+    const cloud = document.getElementById('tokenCloud');
+    if (!claimedTokens.length) {
+        cloud.innerHTML = '<span style="font-style:italic; color:var(--muted); font-size:0.8rem;">No tokens claimed yet.</span>';
+        return;
+    }
+    cloud.innerHTML = claimedTokens.map(t => {
+        const cls = t.counter_domain ? 'token-chip counter' : 'token-chip';
+        return `<span class="${cls}" title="${t.domain || ''}${t.counter_domain ? ' ↔ ' + t.counter_domain : ''}">${t.body}</span>`;
     }).join('');
 }
 
-function esc(s) { return String(s||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]); }
+function renderPairs() {
+    const grid = document.getElementById('pairsGrid');
+
+    if (!formedPairs.length) {
+        grid.innerHTML = `
+            <div class="empty-sanctum">
+                <span class="empty-glyph">♀</span>
+                <p>The temple awaits.<br>Summon tokens, then perform the binding rite.</p>
+            </div>`;
+        return;
+    }
+
+    grid.innerHTML = formedPairs.map((p, i) => {
+        const af = p.affinity_score;
+        const tn = p.tension_score;
+        const afClass = af >= 0.7 ? 'affinity-high' : af >= 0.4 ? 'affinity-med' : 'affinity-low';
+        const tnClass = tn >= 0.6 ? 'tension-high' : 'tension-low';
+        const delay = `animation-delay: ${i * 0.05}s`;
+
+        return `
+        <div class="pair-card${p.counter_domain_pair ? ' counter-domain' : ''}" style="${delay}">
+            <div class="pair-union">
+                <span class="pair-word">${esc(p.token_a_body)}</span>
+                <span class="pair-connector">∿</span>
+                <span class="pair-word b">${esc(p.token_b_body)}</span>
+            </div>
+            ${p.counter_domain_pair ? '<span class="pair-counter-badge">⚡ Counter-Domain Tension</span>' : ''}
+            <span class="pair-type-badge">${esc(p.pair_type || '—')}</span>
+            ${p.visual_mood ? `<span class="pair-type-badge">${esc(p.visual_mood)}</span>` : ''}
+            <div class="pair-scores">
+                <div class="pair-score-item">
+                    <span class="pair-score-value ${afClass}">${Math.round(af * 100)}</span>
+                    <span class="pair-score-label">Affinity</span>
+                </div>
+                <div class="pair-score-item">
+                    <span class="pair-score-value ${tnClass}">${Math.round(tn * 100)}</span>
+                    <span class="pair-score-label">Tension</span>
+                </div>
+                <div class="pair-score-item">
+                    <span class="pair-score-value" style="color:var(--muted); font-size:0.7rem;">${esc(p.domain_a || '·')} / ${esc(p.domain_b || '·')}</span>
+                    <span class="pair-score-label">Domains</span>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function updateStats() {
+    document.getElementById('tokenCount').textContent = claimedTokens.length || '—';
+    document.getElementById('vocabSize').textContent = claimedTokens.length || '—';
+    document.getElementById('pairCount').textContent = formedPairs.length || '—';
+    document.getElementById('counterCount').textContent = formedPairs.filter(p => p.counter_domain_pair).length || '—';
+}
+
+// ── UTILITIES ───────────────────────────────────────
+function log(msg, type = '') {
+    const el = document.getElementById('oracleLog');
+    const div = document.createElement('div');
+    div.className = `log-line ${type}`;
+    div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    el.prepend(div);
+    while (el.children.length > 40) el.removeChild(el.lastChild);
+}
+
+function setBusy(id, label) {
+    const btn = document.getElementById(id);
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spin">⟳</span> ${label}`;
+}
+
+function clearBusy(id, label) {
+    const btn = document.getElementById(id);
+    btn.disabled = false;
+    btn.textContent = label;
+}
+
+function esc(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[c]);
+}
 
 async function archiveSelf() {
     try {
-        const html = document.documentElement.outerHTML;
         await sb.from('html').upsert({
-            filename: 'aphrodite.html', title: '💗 Aphrodite · Love Letter Composer', type: 'olympian',
-            content: html, description: 'Claims love tokens from Hermes by domain, composes couplets, dispatches to Apollo',
-            reads_from: ['concepts'], writes_to: ['aphrodite_dispatch'],
+            filename: 'aphrodite.html',
+            title: 'APHRODITE · Temple of Love',
+            type: 'olympian',
+            content: document.documentElement.outerHTML,
+            description: 'Claims tokens from Hermes, forms semantic pairs, writes to pairs table for Ares',
+            reads_from: ['tokens'],
+            writes_to: ['pairs'],
             models_used: ['Xenova/all-MiniLM-L6-v2'],
-            url: window.location.href, updated_at: new Date().toISOString()
+            url: window.location.href,
+            updated_at: new Date().toISOString()
         }, { onConflict: 'filename' });
     } catch {}
 }
 
+// ── INIT ────────────────────────────────────────────
 function init() {
     document.getElementById('claimBtn').onclick = claimTokens;
-    document.getElementById('composeBtn').onclick = composeLetters;
-    document.getElementById('dispatchBtn').onclick = dispatchToApollo;
+    document.getElementById('pairBtn').onclick   = formPairs;
+    document.getElementById('dispatchBtn').onclick = dispatchToAres;
+    document.getElementById('clearBtn').onclick  = clearConsumed;
     loadModel();
-    setTimeout(archiveSelf, 3000);
-    log('💗 Aphrodite — Pythagorean #2. Claims love by domain.');
+    setTimeout(archiveSelf, 4000);
 }
+
 init();
 </script>
 </body>
